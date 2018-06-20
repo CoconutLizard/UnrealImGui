@@ -1,13 +1,12 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiPrivatePCH.h"
-
 #include "ImGuiInputState.h"
+
+#include "ImGuiPrivatePCH.h"
 
 #include <algorithm>
 #include <limits>
 #include <type_traits>
-
 
 // If TCHAR is wider than ImWchar, enable or disable validation of input character before conversions.
 #define VALIDATE_INPUT_CHARACTERS 1
@@ -82,7 +81,7 @@ void FImGuiInputState::SetMouseDown(uint32 MouseIndex, bool bIsDown)
 	}
 }
 
-void FImGuiInputState::Reset(bool bKeyboard, bool bMouse, bool bNavigation)
+void FImGuiInputState::Reset(bool bKeyboard, bool bMouse)
 {
 	if (bKeyboard)
 	{
@@ -99,11 +98,6 @@ void FImGuiInputState::Reset(bool bKeyboard, bool bMouse, bool bNavigation)
 	if (bKeyboard && bMouse)
 	{
 		ClearModifierKeys();
-	}
-
-	if (bNavigation)
-	{
-		ClearNavigationInputs();
 	}
 }
 
@@ -157,10 +151,3 @@ void FImGuiInputState::ClearModifierKeys()
 	bIsShiftDown = false;
 	bIsAltDown = false;
 }
-
-void FImGuiInputState::ClearNavigationInputs()
-{
-	using std::fill;
-	fill(NavigationInputs, &NavigationInputs[Utilities::GetArraySize(NavigationInputs)], 0.f);
-}
-

@@ -1,5 +1,7 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
+#include "ImGuiImplementation.h"
+
 #include "ImGuiPrivatePCH.h"
 
 // We build ImGui source code as part of this module. This is for convenience (no need to manually build libraries for
@@ -19,36 +21,28 @@
 #include <AllowWindowsPlatformTypes.h>
 #endif // PLATFORM_WINDOWS
 
-#include "imgui.cpp"
-#include "imgui_demo.cpp"
-#include "imgui_draw.cpp"
+#include "../ThirdParty/ImGuiLibrary/Private/imgui.cpp"
+
+//#include "imgui.cpp"
+#include "../ThirdParty/ImGuiLibrary/Private/imgui_demo.cpp"
+#include "../ThirdParty/ImGuiLibrary/Private/imgui_draw.cpp"
 
 #if PLATFORM_WINDOWS
 #include <HideWindowsPlatformTypes.h>
 #endif // PLATFORM_WINDOWS
 
 
-#include "ImGuiInteroperability.h"
-
 namespace ImGuiImplementation
 {
-	bool GetCursorData(ImGuiMouseCursor CursorType, FVector2D& OutSize, FVector2D& OutUVMin, FVector2D& OutUVMax, FVector2D& OutOutlineUVMin, FVector2D& OutOutlineUVMax)
+	// This is exposing ImGui default context for the whole module.
+	// This is assuming that we don't define custom GImGui and therefore have GImDefaultContext defined in imgui.cpp.
+	ImGuiContext& GetDefaultContext()
 	{
-		ImFontAtlas* FontAtlas = ImGui::GetIO().Fonts;
-		ImVec2 Offset, Size, UV[4];
-		if (FontAtlas && FontAtlas->GetMouseCursorTexData(CursorType, &Offset, &Size, &UV[0], &UV[2]))
-		{
-			using namespace ImGuiInterops;
-			OutSize = ToVector2D(Size);
-			OutUVMin = ToVector2D(UV[0]);
-			OutUVMax = ToVector2D(UV[1]);
-			OutOutlineUVMin = ToVector2D(UV[2]);
-			OutOutlineUVMax = ToVector2D(UV[3]);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return GImDefaultContext;
+	}
+
+	void SaveCurrentContextIniSettings(const char* Filename)
+	{
+		SaveIniSettingsToDisk(Filename);
 	}
 }

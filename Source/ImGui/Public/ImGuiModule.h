@@ -110,4 +110,10 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+	/**
+	 * Getter to get the input state used
+		Implementation by WHinds
+	 */
+	IMGUI_API FImGuiInputState& GetInputState();
 };

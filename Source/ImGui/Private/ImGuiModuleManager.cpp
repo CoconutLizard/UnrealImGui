@@ -1,13 +1,11 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiPrivatePCH.h"
-
 #include "ImGuiModuleManager.h"
+
+#include "ImGuiPrivatePCH.h"
 
 #include "ImGuiInteroperability.h"
 #include "Utilities/WorldContextIndex.h"
-
-#include <ModuleManager.h>
 
 #include <imgui.h>
 
@@ -17,18 +15,15 @@ FImGuiModuleManager::FImGuiModuleManager()
 	// Typically we will use viewport created events to add widget to new game viewports.
 	ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddRaw(this, &FImGuiModuleManager::OnViewportCreated);
 
-	// Try to register tick delegate (it may fail if Slate application isn't yet ready).
-	RegisterTick();
-
-	// If we failed to register, create an initializer that will do it later.
-	if (!IsTickRegistered())
-	{
-		CreateTickInitializer();
-	}
+	// Initialize resources and start ticking. Depending on loading phase, this may fail if Slate is not yet ready.
+	Initialize();
 
 	// We need to add widgets to active game viewports as they won't generate on-created events. This is especially
 	// important during hot-reloading.
-	AddWidgetsToActiveViewports();
+	if (bInitialized)
+	{
+		AddWidgetToAllViewports();
+	}
 }
 
 FImGuiModuleManager::~FImGuiModuleManager()
@@ -50,39 +45,57 @@ FImGuiModuleManager::~FImGuiModuleManager()
 	}
 
 	// Deactivate this manager.
-	ReleaseTickInitializer();
-	UnregisterTick();
+	Uninitialize();
+}
+
+void FImGuiModuleManager::Initialize()
+{
+	// We rely on Slate, so we can only continue if it is already initialized.
+	if (!bInitialized && FSlateApplication::IsInitialized())
+	{
+		bInitialized = true;
+		LoadTextures();
+		RegisterTick();
+	}
+}
+
+void FImGuiModuleManager::Uninitialize()
+{
+	if (bInitialized)
+	{
+		bInitialized = false;
+		UnregisterTick();
+	}
 }
 
 void FImGuiModuleManager::LoadTextures()
 {
 	checkf(FSlateApplication::IsInitialized(), TEXT("Slate should be initialized before we can create textures."));
 
-	if (!bTexturesLoaded)
-	{
-		bTexturesLoaded = true;
+	// Create an empty texture at index 0. We will use it for ImGui outputs with null texture id.
+	TextureManager.CreatePlainTexture(FName{ "ImGuiModule_Null" }, 2, 2, FColor::White);
 
-		// Create an empty texture at index 0. We will use it for ImGui outputs with null texture id.
-		TextureManager.CreatePlainTexture(FName{ "ImGuiModule_Plain" }, 2, 2, FColor::White);
+	// Create a font atlas texture.
+	ImFontAtlas* Fonts = ImGui::GetIO().Fonts;
+	checkf(Fonts, TEXT("Invalid font atlas."));
 
-		// Create a font atlas texture.
-		ImFontAtlas& Fonts = ContextManager.GetFontAtlas();
+	unsigned char* Pixels;
+	int Width, Height, Bpp;
+	Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
 
-		unsigned char* Pixels;
-		int Width, Height, Bpp;
-		Fonts.GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
+	TextureIndex FontsTexureIndex = TextureManager.CreateTexture(FName{ "ImGuiModule_FontAtlas" }, Width, Height, Bpp, Pixels, false);
 
-		TextureIndex FontsTexureIndex = TextureManager.CreateTexture(FName{ "ImGuiModule_FontAtlas" }, Width, Height, Bpp, Pixels, false);
-
-		// Set font texture index in ImGui.
-		Fonts.TexID = ImGuiInterops::ToImTextureID(FontsTexureIndex);
-	}
+	// Set font texture index in ImGui.
+	Fonts->TexID = ImGuiInterops::ToImTextureID(FontsTexureIndex);
 }
 
 void FImGuiModuleManager::RegisterTick()
 {
-	// Slate Post-Tick is a good moment to end and advance ImGui frame as it minimises a tearing.
-	if (!TickDelegateHandle.IsValid() && FSlateApplication::IsInitialized())
+	checkf(FSlateApplication::IsInitialized(), TEXT("Slate should be initialized before we can register tick listener."));
+
+	// We will tick on Slate Post-Tick events. They are quite convenient as they happen at the very end of the frame,
+	// what helps to minimise tearing.
+	if (!TickDelegateHandle.IsValid())
 	{
 		TickDelegateHandle = FSlateApplication::Get().OnPostTick().AddRaw(this, &FImGuiModuleManager::Tick);
 	}
@@ -97,36 +110,6 @@ void FImGuiModuleManager::UnregisterTick()
 			FSlateApplication::Get().OnPostTick().Remove(TickDelegateHandle);
 		}
 		TickDelegateHandle.Reset();
-	}
-}
-
-void FImGuiModuleManager::CreateTickInitializer()
-{
-	if (!TickInitializerHandle.IsValid())
-	{
-		// Try to register tick delegate until we finally succeed.
-
-		TickInitializerHandle = FModuleManager::Get().OnModulesChanged().AddLambda([this](FName Name, EModuleChangeReason Reason)
-		{
-			if (Reason == EModuleChangeReason::ModuleLoaded)
-			{
-				RegisterTick();
-			}
-
-			if (IsTickRegistered())
-			{
-				ReleaseTickInitializer();
-			}
-		});
-	}
-}
-
-void FImGuiModuleManager::ReleaseTickInitializer()
-{
-	if (TickInitializerHandle.IsValid())
-	{
-		FModuleManager::Get().OnModulesChanged().Remove(TickInitializerHandle);
-		TickInitializerHandle.Reset();
 	}
 }
 
@@ -153,6 +136,9 @@ void FImGuiModuleManager::OnViewportCreated()
 {
 	checkf(FSlateApplication::IsInitialized(), TEXT("We expect Slate to be initialized when game viewport is created."));
 
+	// Make sure that all resources are initialized to handle configurations where this module is loaded before Slate.
+	Initialize();
+
 	// Create widget to viewport responsible for this event.
 	AddWidgetToViewport(GEngine->GameViewport);
 }
@@ -162,19 +148,13 @@ void FImGuiModuleManager::AddWidgetToViewport(UGameViewportClient* GameViewport)
 	checkf(GameViewport, TEXT("Null game viewport."));
 	checkf(FSlateApplication::IsInitialized(), TEXT("Slate should be initialized before we can add widget to game viewports."));
 
-	// Make sure that we have a context for this viewport's world and get its index.
-	int32 ContextIndex;
-	auto& Proxy = ContextManager.GetWorldContextProxy(*GameViewport->GetWorld(), ContextIndex);
+	// This makes sure that context for this world is created.
+	auto& Proxy = ContextManager.GetWorldContextProxy(*GameViewport->GetWorld());
 
-	// Make sure that textures are loaded before the first Slate widget is created.
-	LoadTextures();
-
-	// Create and initialize the widget.
 	TSharedPtr<SImGuiWidget> SharedWidget;
-	SAssignNew(SharedWidget, SImGuiWidget).ModuleManager(this).GameViewport(GameViewport).ContextIndex(ContextIndex);
+	SAssignNew(SharedWidget, SImGuiWidget).ModuleManager(this).GameViewport(GameViewport)
+		.ContextIndex(Utilities::GetWorldContextIndex(GameViewport));
 
-	// We transfer widget ownerships to viewports but we keep weak references in case we need to manually detach active
-	// widgets during module shutdown (important during hot-reloading).
 	if (TWeakPtr<SImGuiWidget>* Slot = Widgets.FindByPredicate([](auto& Widget) { return !Widget.IsValid(); }))
 	{
 		*Slot = SharedWidget;
@@ -185,9 +165,11 @@ void FImGuiModuleManager::AddWidgetToViewport(UGameViewportClient* GameViewport)
 	}
 }
 
-void FImGuiModuleManager::AddWidgetsToActiveViewports()
+void FImGuiModuleManager::AddWidgetToAllViewports()
 {
-	if (FSlateApplication::IsInitialized() && GEngine)
+	checkf(FSlateApplication::IsInitialized(), TEXT("Slate should be initialized before we can add widget to game viewports."));
+
+	if (GEngine)
 	{
 		// Loop as long as we have a valid viewport or until we detect a cycle.
 		UGameViewportClient* GameViewport = GEngine->GameViewport;

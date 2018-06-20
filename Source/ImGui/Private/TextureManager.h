@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Core.h>
+#include <CoreMinimal.h>
 #include <Styling/SlateBrush.h>
 #include <Textures/SlateShaderResource.h>
 

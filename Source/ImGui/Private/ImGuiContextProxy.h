@@ -19,7 +19,7 @@ class FImGuiContextProxy
 {
 public:
 
-	FImGuiContextProxy(const FString& Name, FSimpleMulticastDelegate* InSharedDrawEvent, ImFontAtlas* InFontAtlas);
+	FImGuiContextProxy(const FString& Name, FSimpleMulticastDelegate* InSharedDrawEvent);
 	~FImGuiContextProxy();
 
 	FImGuiContextProxy(const FImGuiContextProxy&) = delete;
@@ -49,13 +49,8 @@ public:
 	// Set this context as current ImGui context.
 	void SetAsCurrent() { ImGui::SetCurrentContext(Context.Get()); }
 
-	// Context display size (read once per frame during context update and cached here for easy access).
-	const FVector2D& GetDisplaySize() const { return DisplaySize; }
-
-	// Whether this context has an active item (read once per frame during context update and cached here for easy access).
 	bool HasActiveItem() const { return bHasActiveItem; }
 
-	// Cursor type desired by this context (this is updated during ImGui frame and cached here during context update, before it is reset).
 	EMouseCursor::Type GetMouseCursor() const { return MouseCursor;  }
 
 	// Delegate called right before ending the frame to allows listeners draw their controls.
@@ -76,8 +71,6 @@ private:
 	void UpdateDrawData(ImDrawData* DrawData);
 
 	TUniquePtr<ImGuiContext> Context;
-
-	FVector2D DisplaySize = FVector2D::ZeroVector;
 
 	EMouseCursor::Type MouseCursor = EMouseCursor::None;
 	bool bHasActiveItem = false;

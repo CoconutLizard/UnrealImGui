@@ -1,10 +1,12 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
+#include "ImGuiDemo.h"
+
 #include "ImGuiPrivatePCH.h"
 
-#include "ImGuiDemo.h"
 #include "ImGuiModuleManager.h"
 #include "Utilities/ScopeGuards.h"
+#include "Stats2.h"
 
 
 namespace CVars
@@ -21,6 +23,7 @@ void FImGuiDemo::DrawControls(int32 ContextIndex)
 {
 	if (CVars::ShowDemo.GetValueOnGameThread() > 0)
 	{
+		QUICK_SCOPE_CYCLE_COUNTER(STAT_ImGuiDEMO);
 		const int32 ContextBit = ContextIndex < 0 ? 0 : 1 << ContextIndex;
 
 		// 1. Show a simple window

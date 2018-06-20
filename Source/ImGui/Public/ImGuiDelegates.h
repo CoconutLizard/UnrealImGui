@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Core.h>
+#include <CoreMinimal.h>
 
 
 /** Delegate that allows to subscribe for ImGui events.  */

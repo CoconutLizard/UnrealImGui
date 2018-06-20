@@ -1,5 +1,7 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
+#include "ImGuiModule.h"
+
 #include "ImGuiPrivatePCH.h"
 
 #include "ImGuiModuleManager.h"
@@ -137,6 +139,12 @@ void FImGuiModule::ToggleShowDemo()
 {
 	SetShowDemo(!IsShowingDemo());
 }
+
+FImGuiInputState& FImGuiModule::GetInputState()
+{
+	return ModuleManager->Widgets[0].Pin()->InputState;
+}
+
 
 #undef LOCTEXT_NAMESPACE
 

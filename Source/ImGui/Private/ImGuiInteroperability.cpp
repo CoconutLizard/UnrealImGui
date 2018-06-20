@@ -1,8 +1,9 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
+#include "ImGuiInteroperability.h"
+
 #include "ImGuiPrivatePCH.h"
 
-#include "ImGuiInteroperability.h"
 #include "ImGuiInputState.h"
 #include "Utilities/Arrays.h"
 
@@ -65,10 +66,8 @@ namespace ImGuiInterops
 				KeyMap[ImGuiKey_PageDown] = GetKeyIndex(EKeys::PageDown);
 				KeyMap[ImGuiKey_Home] = GetKeyIndex(EKeys::Home);
 				KeyMap[ImGuiKey_End] = GetKeyIndex(EKeys::End);
-				KeyMap[ImGuiKey_Insert] = GetKeyIndex(EKeys::Insert);
 				KeyMap[ImGuiKey_Delete] = GetKeyIndex(EKeys::Delete);
 				KeyMap[ImGuiKey_Backspace] = GetKeyIndex(EKeys::BackSpace);
-				KeyMap[ImGuiKey_Space] = GetKeyIndex(EKeys::SpaceBar);
 				KeyMap[ImGuiKey_Enter] = GetKeyIndex(EKeys::Enter);
 				KeyMap[ImGuiKey_Escape] = GetKeyIndex(EKeys::Escape);
 				KeyMap[ImGuiKey_A] = GetKeyIndex(EKeys::A);
@@ -77,6 +76,8 @@ namespace ImGuiInterops
 				KeyMap[ImGuiKey_X] = GetKeyIndex(EKeys::X);
 				KeyMap[ImGuiKey_Y] = GetKeyIndex(EKeys::Y);
 				KeyMap[ImGuiKey_Z] = GetKeyIndex(EKeys::Z);
+				KeyMap[ImGuiKey_T] = GetKeyIndex(EKeys::T);
+				KeyMap[ImGuiKey_SpaceBar] = GetKeyIndex((EKeys::SpaceBar));
 			}
 
 			ImGuiTypes::FKeyMap KeyMap;
@@ -107,6 +108,11 @@ namespace ImGuiInterops
 		checkf(false, TEXT("Couldn't find a Key Code for key '%s'. Expecting that all keys should have a Key Code."), *Key.GetDisplayName().ToString());
 
 		return -1;
+	}
+
+	IMGUI_API FKey GetKeyFromIndex(const uint32& KeyIndex)
+	{
+		return FInputKeyManager::Get().GetKeyFromCodes(KeyIndex, KeyIndex);
 	}
 
 	uint32 GetMouseIndex(const FKey& MouseButton)
@@ -143,7 +149,7 @@ namespace ImGuiInterops
 			return EMouseCursor::Default;
 		case ImGuiMouseCursor_TextInput:
 			return EMouseCursor::TextEditBeam;
-		case ImGuiMouseCursor_ResizeAll:
+		case ImGuiMouseCursor_Move:
 			return EMouseCursor::CardinalCross;
 		case ImGuiMouseCursor_ResizeNS:
 			return  EMouseCursor::ResizeUpDown;
@@ -159,86 +165,9 @@ namespace ImGuiInterops
 		}
 	}
 
-	namespace
-	{
-		inline void UpdateKey(const FKey& Key, const FKey& KeyCondition, float& Value, bool bIsDown)
-		{
-			if (Key == KeyCondition)
-			{
-				Value = (bIsDown) ? 1.f : 0.f;
-			}
-		}
-
-		inline void UpdateAxisValues(float& Axis, float& Opposite, float Value)
-		{
-			constexpr float AxisInputThreshold = 0.166f;
-
-			// Filter out small values to avoid false positives (helpful in case of worn controllers).
-			Axis = FMath::Max(0.f, Value - AxisInputThreshold);
-			Opposite = 0.f;
-		}
-
-		inline void UpdateSymmetricAxis(const FKey& Key, const FKey& KeyCondition, float& Negative, float& Positive, float Value)
-		{
-			if (Key == KeyCondition)
-			{
-				if (Value < 0.f)
-				{
-					UpdateAxisValues(Negative, Positive, -Value);
-				}
-				else
-				{
-					UpdateAxisValues(Positive, Negative, Value);
-				}
-			}
-		}
-	}
-
-	void SetGamepadNavigationKey(ImGuiTypes::FNavInputArray& NavInputs, const FKey& Key, bool bIsDown)
-	{
-#define MAP_KEY(KeyCondition, NavIndex) UpdateKey(Key, KeyCondition, NavInputs[NavIndex], bIsDown)
-
-		if (Key.IsGamepadKey())
-		{
-			MAP_KEY(EKeys::Gamepad_FaceButton_Bottom, ImGuiNavInput_Activate);
-			MAP_KEY(EKeys::Gamepad_FaceButton_Right, ImGuiNavInput_Cancel);
-			MAP_KEY(EKeys::Gamepad_FaceButton_Top, ImGuiNavInput_Input);
-			MAP_KEY(EKeys::Gamepad_FaceButton_Left, ImGuiNavInput_Menu);
-			MAP_KEY(EKeys::Gamepad_DPad_Left, ImGuiNavInput_DpadLeft);
-			MAP_KEY(EKeys::Gamepad_DPad_Right, ImGuiNavInput_DpadRight);
-			MAP_KEY(EKeys::Gamepad_DPad_Up, ImGuiNavInput_DpadUp);
-			MAP_KEY(EKeys::Gamepad_DPad_Down, ImGuiNavInput_DpadDown);
-			MAP_KEY(EKeys::Gamepad_LeftShoulder, ImGuiNavInput_FocusPrev);
-			MAP_KEY(EKeys::Gamepad_RightShoulder, ImGuiNavInput_FocusNext);
-			MAP_KEY(EKeys::Gamepad_LeftShoulder, ImGuiNavInput_TweakSlow);
-			MAP_KEY(EKeys::Gamepad_RightShoulder, ImGuiNavInput_TweakFast);
-		}
-
-#undef MAP_KEY
-	}
-
-	void SetGamepadNavigationAxis(ImGuiTypes::FNavInputArray& NavInputs, const FKey& Key, float Value)
-	{
-#define MAP_SYMMETRIC_AXIS(KeyCondition, NegNavIndex, PosNavIndex) UpdateSymmetricAxis(Key, KeyCondition, NavInputs[NegNavIndex], NavInputs[PosNavIndex], Value)
-
-		if (Key.IsGamepadKey())
-		{
-			MAP_SYMMETRIC_AXIS(EKeys::Gamepad_LeftX, ImGuiNavInput_LStickLeft, ImGuiNavInput_LStickRight);
-			MAP_SYMMETRIC_AXIS(EKeys::Gamepad_LeftY, ImGuiNavInput_LStickDown, ImGuiNavInput_LStickUp);
-		}
-
-#undef MAP_SYMMETRIC_AXIS
-	}
-
 	//====================================================================================================
 	// Input State Copying
 	//====================================================================================================
-
-	template<typename TFlags, typename TFlag>
-	static inline constexpr void SetFlag(TFlags& Flags, TFlag Flag, bool bSet)
-	{
-		Flags = bSet ? Flags | Flag : Flags & ~Flag;
-	}
 
 	void CopyInput(ImGuiIO& IO, const FImGuiInputState& InputState)
 	{
@@ -280,14 +209,5 @@ namespace ImGuiInterops
 		{
 			Copy(InputState.GetCharacters(), IO.InputCharacters);
 		}
-
-		if (InputState.IsGamepadNavigationEnabled() && InputState.HasGamepad())
-		{
-			Copy(InputState.GetNavigationInputs(), IO.NavInputs);
-		}
-
-		SetFlag(IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard, InputState.IsKeyboardNavigationEnabled());
-		SetFlag(IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad, InputState.IsGamepadNavigationEnabled());
-		SetFlag(IO.BackendFlags, ImGuiBackendFlags_HasGamepad, InputState.HasGamepad());
 	}
 }

@@ -1,8 +1,8 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiPrivatePCH.h"
-
 #include "ImGuiContextManager.h"
+
+#include "ImGuiPrivatePCH.h"
 
 #include "ImGuiImplementation.h"
 #include "Utilities/ScopeGuards.h"
@@ -72,10 +72,6 @@ namespace
 
 FImGuiContextManager::FImGuiContextManager()
 {
-	unsigned char* Pixels;
-	int Width, Height, Bpp;
-	FontAtlas.GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
-
 	FWorldDelegates::OnWorldTickStart.AddRaw(this, &FImGuiContextManager::OnWorldTickStart);
 }
 
@@ -83,6 +79,8 @@ FImGuiContextManager::~FImGuiContextManager()
 {
 	// Order matters because contexts can be created during World Tick Start events.
 	FWorldDelegates::OnWorldTickStart.RemoveAll(this);
+	Contexts.Empty();
+	ImGui::Shutdown();
 }
 
 void FImGuiContextManager::Tick(float DeltaSeconds)
@@ -120,7 +118,7 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetEditorContextData()
 
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Utilities::EDITOR_CONTEXT_INDEX, FContextData{ GetEditorContextName(), Utilities::EDITOR_CONTEXT_INDEX, DrawMultiContextEvent, FontAtlas, ImGuiDemo, -1 });
+		Data = &Contexts.Emplace(Utilities::EDITOR_CONTEXT_INDEX, FContextData{ GetEditorContextName(), Utilities::EDITOR_CONTEXT_INDEX, DrawMultiContextEvent, ImGuiDemo, -1 });
 	}
 
 	return *Data;
@@ -134,7 +132,7 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetStandaloneWorldCont
 
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Utilities::STANDALONE_GAME_CONTEXT_INDEX, FContextData{ GetWorldContextName(), Utilities::STANDALONE_GAME_CONTEXT_INDEX, DrawMultiContextEvent, FontAtlas, ImGuiDemo });
+		Data = &Contexts.Emplace(Utilities::STANDALONE_GAME_CONTEXT_INDEX, FContextData{ GetWorldContextName(), Utilities::STANDALONE_GAME_CONTEXT_INDEX, DrawMultiContextEvent, ImGuiDemo });
 	}
 
 	return *Data;
@@ -174,7 +172,7 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(co
 #if WITH_EDITOR
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, FontAtlas, ImGuiDemo, WorldContext->PIEInstance });
+		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, ImGuiDemo, WorldContext->PIEInstance });
 	}
 	else
 	{
@@ -184,7 +182,7 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(co
 #else
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, FontAtlas, ImGuiDemo });
+		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, ImGuiDemo });
 	}
 #endif
 

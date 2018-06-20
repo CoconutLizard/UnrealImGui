@@ -2,9 +2,15 @@
 
 #pragma once
 
-#include <Core.h>
-#include <Engine.h>
+#include "CoreMinimal.h"
 
+#ifndef SUPPRESS_MONOLITHIC_HEADER_WARNINGS
+#define SUPPRESS_MONOLITHIC_HEADER_WARNINGS
+#include "Engine.h"
+#undef SUPPRESS_MONOLITHIC_HEADER_WARNINGS
+#else
+#include "Engine.h"
+#endif
 
 // Utilities helping to get a World Context.
 

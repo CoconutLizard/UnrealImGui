@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "Widgets/SLeafWidget.h"
 #include "ImGuiInputState.h"
 
-#include <Widgets/SLeafWidget.h>
-
+#include "Widgets/DeclarativeSyntaxSupport.h"
 
 class FImGuiModuleManager;
 
@@ -36,7 +36,7 @@ public:
 	// Get the game viewport to which this widget is attached.
 	const TWeakObjectPtr<UGameViewportClient>& GetGameViewport() const { return GameViewport; }
 
-	// Detach widget from viewport assigned during construction (effectively allowing to dispose this widget).
+	// Detach widget from viewport assigned during construction (effectively allowing to dispose this widget). 
 	void Detach();
 
 	//----------------------------------------------------------------------------------------------------
@@ -52,8 +52,6 @@ public:
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent) override;
 
 	virtual FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent) override;
-
-	virtual FReply OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent) override;
 
 	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
@@ -82,12 +80,9 @@ private:
 		None,
 		// Mouse pointer only without user focus
 		MousePointerOnly,
-		// Full input with user focus (mouse, keyboard and depending on navigation mode gamepad)
-		Full
+		// Full input with user focus
+		MouseAndKeyboard
 	};
-
-	// If needed, add to event reply a mouse lock or unlock request.
-	FORCEINLINE FReply WithMouseLockRequests(FReply&& Reply);
 
 	FORCEINLINE void CopyModifierKeys(const FInputEvent& InputEvent);
 	FORCEINLINE void CopyModifierKeys(const FPointerEvent& MouseEvent);
@@ -95,8 +90,6 @@ private:
 	bool IsConsoleOpened() const;
 
 	bool IgnoreKeyEvent(const FKeyEvent& KeyEvent) const;
-
-	void SetMouseCursorOverride(EMouseCursor::Type InMouseCursorOverride);
 
 	// Update visibility based on input enabled state.
 	void SetVisibilityFromInputEnabled();
@@ -115,30 +108,6 @@ private:
 
 	void OnPostImGuiUpdate();
 
-	// Update canvas map mode based on input state.
-	void UpdateCanvasMapMode(const FInputEvent& InputEvent);
-	void SetCanvasMapMode(bool bEnabled);
-
-	void AddCanvasScale(float Delta);
-	void UdateCanvasScale(float DeltaSeconds);
-
-	void UpdateCanvasDraggingConditions(const FPointerEvent& MouseEvent);
-	void UpdateCanvasDragging(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
-
-	// Canvas scale in which the whole canvas is visible in the viewport. We don't scale below that value.
-	float GetMinCanvasScale() const;
-
-	// Normalized canvas scale mapping range [MinCanvasScale..1] to [0..1].
-	float GetNormalizedCanvasScale(float Scale) const;
-
-	// Position of the canvas origin, given the current canvas scale and offset. Uses NormalizedCanvasScale to smoothly
-	// transition between showing visible canvas area at scale 1 and the whole canvas at min canvas scale. 
-	FVector2D GetCanvasPosition(float Scale, const FVector2D& Offset) const;
-
-	bool InFrameGrabbingRange(const FVector2D& Position, float Scale, const FVector2D& Offset) const;
-
-	FVector2D GetViewportSize() const;
-
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
 
 	virtual FVector2D ComputeDesiredSize(float) const override;
@@ -153,37 +122,12 @@ private:
 
 	int32 ContextIndex = 0;
 
-	FImGuiInputState InputState;
-
 	EInputMode InputMode = EInputMode::None;
 	bool bInputEnabled = false;
 	bool bReceivedMouseEvent = false;
-	bool bMouseLock = false;
 
-	// Canvas map mode allows to zoom in/out and navigate between different parts of ImGui canvas.
-	bool bCanvasMapMode = false;
-
-	// If enabled (only if not fully zoomed out), allows to drag ImGui canvas. Dragging canvas modifies canvas offset.
-	bool bCanvasDragging = false;
-
-	// If enabled (only if zoomed out), allows to drag a frame that represents a visible area of the ImGui canvas.
-	// Mouse deltas are converted to canvas offset by linear formula derived from GetCanvasPosition function.
-	bool bFrameDragging = false;
-
-	// True, if mouse and input are in state that allows to start frame dragging. Used for highlighting.
-	bool bFrameDraggingReady = false;
-
-	bool bFrameDraggingSkipMouseMove = false;
-
-	EMouseCursor::Type MouseCursorOverride = EMouseCursor::None;
-
-	float TargetCanvasScale = 1.f;
-
-	float CanvasScale = 1.f;
-	FVector2D CanvasOffset = FVector2D::ZeroVector;
-
-	float ImGuiFrameCanvasScale = 1.f;
-	FVector2D ImGuiFrameCanvasOffset = FVector2D::ZeroVector;
+	friend class FImGuiModule;
+	FImGuiInputState InputState;
 
 	TWeakPtr<SWidget> PreviousUserFocusedWidget;
 };
