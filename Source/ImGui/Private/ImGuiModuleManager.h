@@ -19,7 +19,7 @@ public:
 	FImGuiContextManager& GetContextManager() { return ContextManager; }
 
 	// Get texture resources manager.
-	FTextureManager& GetTextureManager() { return TextureManager; }
+	IMGUI_API FTextureManager& GetTextureManager() { return TextureManager; }
 
 	// Event called right after ImGui is updated, to give other subsystems chance to react.
 	FSimpleMulticastDelegate& OnPostImGuiUpdate() { return PostImGuiUpdateEvent; }

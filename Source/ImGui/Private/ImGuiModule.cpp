@@ -146,6 +146,11 @@ FImGuiInputState& FImGuiModule::GetInputState()
 }
 
 
+FImGuiModuleManager* FImGuiModule::GetModuleManager()
+{
+	return ModuleManager;
+}
+
 #undef LOCTEXT_NAMESPACE
 
 IMPLEMENT_MODULE(FImGuiModule, ImGui)

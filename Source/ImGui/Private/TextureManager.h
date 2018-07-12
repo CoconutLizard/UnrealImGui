@@ -69,6 +69,8 @@ public:
 	// @returns The index of a texture that was created
 	TextureIndex CreatePlainTexture(const FName& Name, int32 Width, int32 Height, FColor Color);
 
+	IMGUI_API TextureIndex AddTexture(const FName& Name, UTexture2D* Texture) { return TextureResources.Emplace(Name, Texture); }
+
 private:
 
 	// Entry for texture resources. Only supports explicit construction.

@@ -6,6 +6,7 @@
 
 #include <ModuleManager.h>
 
+class FImGuiModuleManager;
 
 class FImGuiModule : public IModuleInterface
 {
@@ -116,4 +117,6 @@ public:
 		Implementation by WHinds
 	 */
 	IMGUI_API FImGuiInputState& GetInputState();
+
+	IMGUI_API FImGuiModuleManager* GetModuleManager();
 };
