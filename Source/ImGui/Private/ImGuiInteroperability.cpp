@@ -159,6 +159,12 @@ namespace ImGuiInterops
 			return  EMouseCursor::ResizeSouthWest;
 		case ImGuiMouseCursor_ResizeNWSE:
 			return  EMouseCursor::ResizeSouthEast;
+		case ImGuiMouseCursor_GrabOpen:
+			return  EMouseCursor::GrabHand;
+		case ImGuiMouseCursor_GrabClosed:
+			return  EMouseCursor::GrabHandClosed;
+		case ImGuiMouseCursor_Hand:
+			return  EMouseCursor::Hand;
 		case ImGuiMouseCursor_None:
 		default:
 			return EMouseCursor::None;

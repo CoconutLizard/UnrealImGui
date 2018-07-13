@@ -821,7 +821,10 @@ enum ImGuiMouseCursor_
     ImGuiMouseCursor_ResizeNS,          // When hovering over an horizontal border
     ImGuiMouseCursor_ResizeEW,          // When hovering over a vertical border or a column
     ImGuiMouseCursor_ResizeNESW,        // When hovering over the bottom-left corner of a window
-    ImGuiMouseCursor_ResizeNWSE,        // When hovering over the bottom-right corner of a window
+	ImGuiMouseCursor_ResizeNWSE,        // When hovering over the bottom-right corner of a window
+	ImGuiMouseCursor_Hand,
+	ImGuiMouseCursor_GrabOpen,			// Grab hand open
+	ImGuiMouseCursor_GrabClosed,		// Grab hand closed
     ImGuiMouseCursor_Count_
 };
 
