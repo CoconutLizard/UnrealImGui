@@ -5,7 +5,7 @@
 #include <CoreMinimal.h>
 #include <Styling/SlateBrush.h>
 #include <Textures/SlateShaderResource.h>
-
+#include "Engine/Texture2D.h"
 
 // Index type to be used as a texture handle.
 using TextureIndex = int32;

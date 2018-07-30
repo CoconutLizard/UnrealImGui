@@ -8,6 +8,8 @@
 
 #include <imgui.h>
 
+#include "SlateRect.h"
+
 
 class FImGuiInputState;
 
