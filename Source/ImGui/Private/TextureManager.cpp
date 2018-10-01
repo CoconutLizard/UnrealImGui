@@ -56,7 +56,7 @@ FTextureManager::FTextureEntry::FTextureEntry(const FName& InName, UTexture2D* I
 
 	// Create brush and resource handle for input texture.
 	Brush.SetResourceObject(Texture);
-	ResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(Brush);
+	ResourceHandle = 0;// FSlateApplication::Get().GetRenderer()->GetResourceHandle(Brush);
 }
 
 FTextureManager::FTextureEntry::~FTextureEntry()
