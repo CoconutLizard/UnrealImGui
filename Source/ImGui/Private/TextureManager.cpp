@@ -27,7 +27,7 @@ TextureIndex FTextureManager::CreateTexture(const FName& Name, int32 Width, int3
 		}
 		delete UpdateRegion;
 	};
-	Texture->UpdateTextureRegions(0, 1u, TextureRegion, SrcBpp * Width, SrcBpp, SrcData, DataCleanup);
+	Texture->UpdateTextureRegions(0, 1u, TextureRegion, SrcBpp * Width, SrcBpp, SrcData, true/*DataCleanup*/);
 
 	// Create a new entry for the texture.
 	return TextureResources.Emplace(Name, Texture);
