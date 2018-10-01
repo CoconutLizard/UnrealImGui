@@ -36,7 +36,7 @@ TextureIndex FTextureManager::CreateTexture(const FName& Name, int32 Width, int3
 TextureIndex FTextureManager::CreatePlainTexture(const FName& Name, int32 Width, int32 Height, FColor Color)
 {
 	// Create buffer with raw data.
-	const uint32 ColorPacked = Color.ToPackedARGB();
+	const uint32 ColorPacked = Color.DWColor();
 	const uint32 Bpp = sizeof(ColorPacked);
 	const uint32 SizeInPixels = Width * Height;
 	const uint32 SizeInBytes = SizeInPixels * Bpp;
