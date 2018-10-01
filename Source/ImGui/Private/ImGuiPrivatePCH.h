@@ -4,7 +4,7 @@
 #include "ImGuiModule.h"
 
 // Engine
-#include <CoreMinimal.h>
+//#include <CoreMinimal.h>
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 
 // You should place include statements to your module's private header files here.  You only need to

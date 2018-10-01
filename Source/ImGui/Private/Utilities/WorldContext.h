@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
 
 #ifndef SUPPRESS_MONOLITHIC_HEADER_WARNINGS
 #define SUPPRESS_MONOLITHIC_HEADER_WARNINGS

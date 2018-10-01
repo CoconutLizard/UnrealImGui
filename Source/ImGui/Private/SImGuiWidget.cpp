@@ -11,6 +11,8 @@
 #include "TextureManager.h"
 #include "Utilities/ScopeGuards.h"
 
+#include "RenderingCommon.h"
+
 #include <Engine/Console.h>
 
 #include <utility>
