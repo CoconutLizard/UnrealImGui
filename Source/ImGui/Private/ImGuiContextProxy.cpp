@@ -40,7 +40,7 @@ namespace
 	FString GetIniFile(const FString& Name)
 	{
 		static FString SaveDirectory = GetSaveDirectory();
-		return FPaths::Combine(SaveDirectory, Name + TEXT(".ini"));
+		return FPaths::Combine(SaveDirectory.GetCharArray().GetData(), FString(Name + TEXT(".ini")).GetCharArray().GetData());
 	}
 }
 
