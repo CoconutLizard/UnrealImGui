@@ -11,7 +11,7 @@ void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const
 #endif // WITH_OBSOLETE_CLIPPING_API
 {
 	// Reset and reserve space in destination buffer.
-	OutVertexBuffer.SetNumUninitialized(ImGuiVertexBuffer.Size, false);
+	OutVertexBuffer.SetNumUninitialized(ImGuiVertexBuffer.Size);
 
 	// Transform and copy vertex data.
 	for (int Idx = 0; Idx < ImGuiVertexBuffer.Size; Idx++)
@@ -41,7 +41,7 @@ void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const
 void FImGuiDrawList::CopyIndexData(TArray<SlateIndex>& OutIndexBuffer, const int32 StartIndex, const int32 NumElements) const
 {
 	// Reset buffer.
-	OutIndexBuffer.SetNumUninitialized(NumElements, false);
+	OutIndexBuffer.SetNumUninitialized(NumElements);
 
 	// Copy elements (slow copy because of different sizes of ImDrawIdx and SlateIndex and because SlateIndex can
 	// have different size on different platforms).
