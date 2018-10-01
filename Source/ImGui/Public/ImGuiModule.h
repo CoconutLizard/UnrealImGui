@@ -7,6 +7,7 @@
 #include <ModuleManager.h>
 
 class FImGuiModuleManager;
+class FImGuiInputState;
 
 class FImGuiModule : public IModuleInterface
 {
