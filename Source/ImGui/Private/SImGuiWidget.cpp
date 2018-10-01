@@ -486,7 +486,7 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 #endif // WITH_OBSOLETE_CLIPPING_API
 
 				// Add elements to the list.
-				FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, Handle, VertexBuffer, IndexBuffer, nullptr, 0, 0);
+				//FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, Handle, VertexBuffer, IndexBuffer, nullptr, 0, 0);
 
 #if !WITH_OBSOLETE_CLIPPING_API
 				OutDrawElements.PopClip();
