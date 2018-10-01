@@ -116,7 +116,7 @@ bool FImGuiModule::IsInputMode() const
 void FImGuiModule::SetInputMode(bool bEnabled)
 {
 	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	CVars::InputEnabled->Set(bEnabled ? 1 : 0, ECVF_SetByConsole);
+	CVars::InputEnabled.AsVariable()->Set(bEnabled ? 1 : 0, ECVF_SetByConsole);
 }
 
 void FImGuiModule::ToggleInputMode()
@@ -132,7 +132,7 @@ bool FImGuiModule::IsShowingDemo() const
 void FImGuiModule::SetShowDemo(bool bShow)
 {
 	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	CVars::ShowDemo->Set(bShow ? 1 : 0, ECVF_SetByConsole);
+	CVars::ShowDemo.AsVariable()->Set(bShow ? 1 : 0, ECVF_SetByConsole);
 }
 
 void FImGuiModule::ToggleShowDemo()

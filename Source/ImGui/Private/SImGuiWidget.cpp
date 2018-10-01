@@ -683,7 +683,7 @@ void SImGuiWidget::OnDebugDraw()
 
 		if (!bDebug)
 		{
-			CVars::DebugWidget->Set(0, ECVF_SetByConsole);
+			CVars::DebugWidget.AsVariable()->Set(0, ECVF_SetByConsole);
 		}
 	}
 
@@ -775,7 +775,7 @@ void SImGuiWidget::OnDebugDraw()
 
 			if (!bDebug)
 			{
-				CVars::DebugInput->Set(0, ECVF_SetByConsole);
+				CVars::DebugInput.AsVariable()->Set(0, ECVF_SetByConsole);
 			}
 		}
 		ImGui::End();
