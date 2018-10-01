@@ -1,8 +1,8 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiContextManager.h"
-
 #include "ImGuiPrivatePCH.h"
+
+#include "ImGuiContextManager.h"
 
 #include "ImGuiImplementation.h"
 #include "Utilities/ScopeGuards.h"

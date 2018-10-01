@@ -1,8 +1,8 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiModule.h"
-
 #include "ImGuiPrivatePCH.h"
+
+#include "ImGuiModule.h"
 
 #include "ImGuiModuleManager.h"
 #include "Utilities/WorldContext.h"

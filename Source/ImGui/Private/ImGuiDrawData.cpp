@@ -1,9 +1,8 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
-#include "ImGuiDrawData.h"
-
 #include "ImGuiPrivatePCH.h"
 
+#include "ImGuiDrawData.h"
 
 #if WITH_OBSOLETE_CLIPPING_API
 void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FVector2D VertexPositionOffset, const FSlateRotatedRect& VertexClippingRect) const
