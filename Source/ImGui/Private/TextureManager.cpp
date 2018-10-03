@@ -54,9 +54,8 @@ FTextureManager::FTextureEntry::FTextureEntry(const FName& InName, UTexture2D* I
 	// Add texture to root to prevent garbage collection.
 	Texture->AddToRoot();
 
-	// Create brush and resource handle for input texture.
+	// Create brush for input texture.
 	Brush.SetResourceObject(Texture);
-	ResourceHandle = 0;// FSlateApplication::Get().GetRenderer()->GetResourceHandle(Brush);
 }
 
 FTextureManager::FTextureEntry::~FTextureEntry()

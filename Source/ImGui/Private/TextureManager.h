@@ -9,8 +9,6 @@
 // Index type to be used as a texture handle.
 using TextureIndex = int32;
 
-typedef int32 FSlateResourceHandle;
-
 // Manager for textures resources which can be referenced by a unique name or index.
 // Name is primarily for lookup and index provides a direct access to resources.
 class FTextureManager
@@ -47,9 +45,9 @@ public:
 	// Get the Slate Resource Handle to a texture at given index. Throws exception if index is out of range.
 	// @param Index - Index of a texture
 	// @returns The Slate Resource Handle for a texture at given index
-	FORCEINLINE const FSlateResourceHandle& GetTextureHandle(TextureIndex Index) const
+	FORCEINLINE const FSlateBrush& GetBrush(TextureIndex Index) const
 	{
-		return TextureResources[Index].ResourceHandle;
+		return TextureResources[Index].Brush;
 	}
 
 	// Create a texture from raw data. Throws exception if there is already a texture with that name.
@@ -91,7 +89,6 @@ private:
 		FName Name = NAME_None;
 		UTexture2D* Texture = nullptr;
 		FSlateBrush Brush;
-		FSlateResourceHandle ResourceHandle;
 	};
 
 	TArray<FTextureEntry> TextureResources;

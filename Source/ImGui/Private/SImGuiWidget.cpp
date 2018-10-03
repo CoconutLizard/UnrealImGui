@@ -474,7 +474,7 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 				IndexBufferOffset += DrawCommand.NumElements;
 
 				// Get texture resource handle for this draw command (null index will be also mapped to a valid texture).
-				const FSlateResourceHandle/*&*/ Handle = 0;// ModuleManager->GetTextureManager().GetTextureHandle(DrawCommand.TextureId);
+				const FSlateBrush& Handle = ModuleManager->GetTextureManager().GetBrush(DrawCommand.TextureId);
 
 				// Transform clipping rectangle to screen space and apply to elements that we draw.
 				const FSlateRect ClippingRect = DrawCommand.ClippingRect.OffsetBy(MyClippingRect.GetTopLeft()).IntersectionWith(MyClippingRect);
