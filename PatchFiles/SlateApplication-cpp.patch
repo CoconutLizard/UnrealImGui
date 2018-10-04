@@ -1,0 +1,22 @@
+--- Engine/Source/Runtime/Slate/Private/Framework/Application/SlateApplication.cpp	2018-10-04 13:50:26.538542500 +0100
++++ SlateApplication.cpp	2018-10-04 12:02:43.290267400 +0100
+@@ -1272,10 +1272,8 @@
+ 	}
+ }
+ 
+-
+ extern SLATECORE_API int32 bFoldTick;
+ 
+-
+ void FSlateApplication::Tick()
+ {
+ 	{
+@@ -1302,6 +1300,8 @@
+ 		PlatformApplication->Tick( DeltaTime );
+ 
+ 		PlatformApplication->ProcessDeferredEvents( DeltaTime );
++
++		PostTickEvent.Broadcast(DeltaTime);
+ 	}
+ 
+ 	// The widget locking the cursor to its bounds may have been reshaped.

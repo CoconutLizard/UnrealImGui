@@ -1,0 +1,20 @@
+--- Engine/Source/Runtime/Slate/Public/Framework/Application/SlateApplication.h	2018-10-04 13:50:33.572235600 +0100
++++ SlateApplication.h	2018-10-04 11:51:39.683603200 +0100
+@@ -1136,8 +1136,17 @@
+ 	virtual EDropEffect::Type OnDragDrop( const TSharedPtr< FGenericWindow >& Window ) override;
+ 	virtual bool OnWindowAction( const TSharedRef< FGenericWindow >& PlatformWindow, const EWindowAction::Type InActionType ) override;
+ 
++	/** Event before slate application ticks. */
++	DECLARE_EVENT_OneParam(FSlateApplication, FSlateTickEvent, float);
++
++	/** Event after slate application ticks. */
++	FSlateTickEvent& OnPostTick() { return PostTickEvent; }
++
+ private:
+ 
++	/** Delegate for post slate Tick */
++	FSlateTickEvent PostTickEvent;
++
+ 	/**
+ 	 * Directly routes a pointer down event to the widgets in the specified widget path
+ 	 *

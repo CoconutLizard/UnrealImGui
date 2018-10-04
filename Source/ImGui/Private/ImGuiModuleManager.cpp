@@ -99,7 +99,7 @@ void FImGuiModuleManager::RegisterTick()
 	// what helps to minimise tearing.
 	if (!TickDelegateHandle.IsValid())
 	{
-		//TickDelegateHandle = FSlateApplication::Get().OnPostTick().AddRaw(this, &FImGuiModuleManager::Tick);
+		TickDelegateHandle = FSlateApplication::Get().OnPostTick().AddRaw(this, &FImGuiModuleManager::Tick);
 	}
 }
 
@@ -109,7 +109,7 @@ void FImGuiModuleManager::UnregisterTick()
 	{
 		if (FSlateApplication::IsInitialized())
 		{
-			//FSlateApplication::Get().OnPostTick().Remove(TickDelegateHandle);
+			FSlateApplication::Get().OnPostTick().Remove(TickDelegateHandle);
 		}
 		TickDelegateHandle.Reset();
 	}
