@@ -12,6 +12,10 @@
 #include "Utilities/ScopeGuards.h"
 
 #include "RenderingCommon.h"
+#include "Rendering/ElementBatcher.h"
+#include "Slate/SlateTextures.h"
+#include "../SlateRHIRenderer/Private/SlateRHIRenderer.h"
+#include "../SlateRHIRenderer/Private/SlateRHIResourceManager.h"
 
 #include <Engine/Console.h>
 
@@ -93,6 +97,13 @@ void SImGuiWidget::Construct(const FArguments& InArgs)
 	checkf(ContextProxy, TEXT("Missing context during widget construction: ContextIndex = %d"), ContextIndex);
 	ContextProxy->OnDraw().AddRaw(this, &SImGuiWidget::OnDebugDraw);
 	ContextProxy->SetInputState(&InputState);
+
+	FSlateApplication& SlateApp = FSlateApplication::Get();
+	TSharedPtr<FSlateRenderer> SlateRenderer = SlateApp.Renderer;
+
+	FSlateRenderer* RawRenderer = SlateRenderer.Get();
+
+	SlateRHIRenderer = TSharedPtr<FSlateRHIRenderer>(static_cast<FSlateRHIRenderer*>(RawRenderer));
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -474,7 +485,7 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 				IndexBufferOffset += DrawCommand.NumElements;
 
 				// Get texture resource handle for this draw command (null index will be also mapped to a valid texture).
-				const FSlateBrush& Handle = ModuleManager->GetTextureManager().GetBrush(DrawCommand.TextureId);
+				const FSlateBrush& Brush = ModuleManager->GetTextureManager().GetBrush(DrawCommand.TextureId);
 
 				// Transform clipping rectangle to screen space and apply to elements that we draw.
 				const FSlateRect ClippingRect = DrawCommand.ClippingRect.OffsetBy(MyClippingRect.GetTopLeft()).IntersectionWith(MyClippingRect);
@@ -485,8 +496,50 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 				OutDrawElements.PushClip(FSlateClippingZone{ ClippingRect });
 #endif // WITH_OBSOLETE_CLIPPING_API
 
-				// Add elements to the list.
-				//FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, Handle, VertexBuffer, IndexBuffer, nullptr, 0, 0);
+				TSharedPtr<FSlateElementBatcher> Batcher = SlateRHIRenderer->GetElementBatcher();
+
+				Batcher->BatchData = &OutDrawElements.GetBatchData();
+
+				if (Batcher->BatchData)
+				{
+					FElementBatchMap LayerToElementDefault;
+					FElementBatchMap& LayerToElementBatches = Batcher->BatchData ? Batcher->BatchData->GetElementBatchMap() : LayerToElementDefault;
+
+					if (VertexBuffer.Num() > 0)
+					{
+						// See if the layer already exists.
+						FElementBatchArray* ElementBatches = LayerToElementBatches.Find(LayerId);
+						if (!ElementBatches)
+						{
+							// The layer doesn't exist so make it now
+							ElementBatches = &LayerToElementBatches.Add(LayerId);
+						}
+						check(ElementBatches);
+
+						FSlateElementBatch NewBatch(
+							SlateRHIRenderer->ResourceManager->GetShaderResource(Brush)->Resource,
+							FShaderParams(),
+							ESlateShader::Default,
+							ESlateDrawPrimitive::TriangleList,
+							ESlateDrawEffect::None,
+							ESlateBatchDrawFlag::None,
+							TOptional<FShortRect>()
+						);
+
+						int32 Index = ElementBatches->Add(NewBatch);
+						FSlateElementBatch* ElementBatch = &(*ElementBatches)[Index];
+
+						Batcher->BatchData->AssignVertexArrayToBatch(*ElementBatch);
+						Batcher->BatchData->AssignIndexArrayToBatch(*ElementBatch);
+
+						TArray<FSlateVertex>& BatchVertices = Batcher->BatchData->GetBatchVertexList(*ElementBatch);
+						TArray<SlateIndex>& BatchIndices = Batcher->BatchData->GetBatchIndexList(*ElementBatch);
+
+						// Vertex Buffer since  it is already in slate format it is a straight copy
+						BatchVertices = VertexBuffer;
+						BatchIndices = IndexBuffer;
+					}
+				}
 
 #if !WITH_OBSOLETE_CLIPPING_API
 				OutDrawElements.PopClip();

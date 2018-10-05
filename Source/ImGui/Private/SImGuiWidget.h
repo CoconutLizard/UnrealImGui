@@ -8,12 +8,15 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
 class FImGuiModuleManager;
+class FSlateRHIRenderer;
 
 // Slate widget for rendering ImGui output and storing Slate inputs.
 class SImGuiWidget : public SLeafWidget
 {
 	typedef SLeafWidget Super;
 
+	mutable TSharedPtr<FSlateRHIRenderer> SlateRHIRenderer;
+	
 public:
 
 	SLATE_BEGIN_ARGS(SImGuiWidget)
