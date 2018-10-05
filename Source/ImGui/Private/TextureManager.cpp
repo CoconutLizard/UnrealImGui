@@ -27,7 +27,10 @@ TextureIndex FTextureManager::CreateTexture(const FName& Name, int32 Width, int3
 		}
 		delete UpdateRegion;
 	};
-	Texture->UpdateTextureRegions(0, 1u, TextureRegion, SrcBpp * Width, SrcBpp, SrcData, true/*DataCleanup*/);
+#if WITH_EDITOR
+	Texture->TemporarilyDisableStreaming();
+#endif
+	Texture->UpdateTextureRegions(0, 1u, TextureRegion, SrcBpp * Width, SrcBpp, SrcData, false/*DataCleanup*/);
 
 	// Create a new entry for the texture.
 	return TextureResources.Emplace(Name, Texture);
