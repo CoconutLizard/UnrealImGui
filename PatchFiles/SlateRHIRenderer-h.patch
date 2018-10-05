@@ -1,0 +1,16 @@
+--- ../Engine/Source/Runtime/SlateRHIRenderer/Private/SlateRHIRenderer.h	2018-10-05 12:13:48.139169900 +0100
++++ ../SlateRHIRenderer.h	2018-10-04 15:14:57.364189400 +0100
+@@ -153,9 +153,13 @@
+ 	private:		
+ 	};
+ public:
++	friend class SImGuiWidget;
++
+ 	FSlateRHIRenderer( TSharedPtr<FSlateRHIResourceManager> InResourceManager, TSharedPtr<FSlateFontCache> InFontCache, TSharedPtr<FSlateFontMeasure> InFontMeasure );
+ 	~FSlateRHIRenderer();
+ 
++	inline TSharedPtr<FSlateElementBatcher> GetElementBatcher() const { return ElementBatcher; }
++
+ 	/**
+ 	 * Creates a projection matrix for use when rendering an SWindow
+ 	 *

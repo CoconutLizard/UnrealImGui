@@ -1,0 +1,17 @@
+--- ../Engine/Source/Runtime/SlateCore/Public/Rendering/DrawElements.h	2018-10-05 12:09:56.274648000 +0100
++++ ../DrawElements.h	2018-10-05 11:51:09.765494100 +0100
+@@ -563,12 +563,12 @@
+ 	/**
+ 	 * Assigns a vertex array from the pool which is appropriate for the batch.  Creates a new array if needed
+ 	 */
+-	void AssignVertexArrayToBatch( FSlateElementBatch& Batch );
++	SLATECORE_API void AssignVertexArrayToBatch( FSlateElementBatch& Batch );
+ 
+ 	/**
+ 	 * Assigns an index array from the pool which is appropriate for the batch.  Creates a new array if needed
+ 	 */
+-	void AssignIndexArrayToBatch( FSlateElementBatch& Batch );
++	SLATECORE_API void AssignIndexArrayToBatch( FSlateElementBatch& Batch );
+ 
+ 	/** @return the list of vertices for a batch */
+ 	TArray<FSlateVertex>& GetBatchVertexList( FSlateElementBatch& Batch ) { return BatchVertexArrays[Batch.VertexArrayIndex]; }
