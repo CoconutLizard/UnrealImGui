@@ -15,7 +15,7 @@ class SImGuiWidget : public SLeafWidget
 {
 	typedef SLeafWidget Super;
 
-	mutable TSharedPtr<FSlateRHIRenderer> SlateRHIRenderer;
+	mutable TSharedPtr<FSlateRenderer> SlateRenderer;
 	
 public:
 
