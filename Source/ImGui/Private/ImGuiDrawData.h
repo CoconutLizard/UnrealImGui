@@ -4,10 +4,10 @@
 
 #include "ImGuiInteroperability.h"
 
-#include <Runtime/Launch/Resources/Version.h>
-#include <RenderingCommon.h>
+#include "Runtime/Launch/Resources/Version.h"
+#include "Rendering/RenderingCommon.h"
 
-#include <imgui.h>
+#include "imgui.h"
 
 
 // Starting from version 4.17 Slate doesn't have per-vertex clipping rectangle and GSlateScissorRect. Use this to

@@ -8,7 +8,7 @@
 #include "Utilities/WorldContext.h"
 #include "Utilities/WorldContextIndex.h"
 
-#include <IPluginManager.h>
+#include "Interfaces/IPluginManager.h"
 
 
 #define LOCTEXT_NAMESPACE "FImGuiModule"

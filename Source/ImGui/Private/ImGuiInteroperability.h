@@ -4,11 +4,11 @@
 
 #include "TextureManager.h"
 
-#include <ICursor.h>
+#include "GenericPlatform/ICursor.h"
 
 #include <imgui.h>
 
-#include "SlateRect.h"
+#include "Layout/SlateRect.h"
 
 
 class FImGuiInputState;

@@ -18,17 +18,17 @@
 #endif // PLATFORM_XBOXONE
 
 #if PLATFORM_WINDOWS
-#include <AllowWindowsPlatformTypes.h>
+#include "Windows/AllowWindowsPlatformTypes.h"
 #endif // PLATFORM_WINDOWS
 
-#include "../ThirdParty/ImGuiLibrary/Private/imgui.cpp"
+#include "../../ThirdParty/ImGuiLibrary/Private/imgui.cpp"
 
 //#include "imgui.cpp"
-#include "../ThirdParty/ImGuiLibrary/Private/imgui_demo.cpp"
-#include "../ThirdParty/ImGuiLibrary/Private/imgui_draw.cpp"
+#include "../../ThirdParty/ImGuiLibrary/Private/imgui_demo.cpp"
+#include "../../ThirdParty/ImGuiLibrary/Private/imgui_draw.cpp"
 
 #if PLATFORM_WINDOWS
-#include <HideWindowsPlatformTypes.h>
+#include "Windows/HideWindowsPlatformTypes.h"
 #endif // PLATFORM_WINDOWS
 
 

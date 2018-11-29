@@ -7,7 +7,7 @@
 #include "ImGuiInteroperability.h"
 #include "Utilities/WorldContextIndex.h"
 
-#include "SlateGameResources.h"
+#include "Slate/SlateGameResources.h"
 
 #include <imgui.h>
 

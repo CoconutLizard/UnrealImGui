@@ -6,7 +6,7 @@
 
 #include "ImGuiModuleManager.h"
 #include "Utilities/ScopeGuards.h"
-#include "Stats2.h"
+#include "Stats/Stats2.h"
 
 
 namespace CVars
