@@ -118,6 +118,10 @@ struct ImVec2
 	{
 		return ImVec2(lhs.x - rhs, lhs.y - rhs);
 	}
+	friend ImVec2 operator*(float lhs, ImVec2 rhs)
+	{
+		return ImVec2(rhs.x * lhs, rhs.y * lhs);
+	}
 };
 
 struct ImVec4
