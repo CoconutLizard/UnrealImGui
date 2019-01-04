@@ -3140,7 +3140,7 @@ static void LogRenderedText(const ImVec2* ref_pos, const char* text, const char*
 
 // Internal ImGui functions to render text
 // RenderText***() functions calls ImDrawList::AddText() calls ImBitmapFont::RenderText()
-void ImGui::RenderText(ImVec2 pos, const char* text, const char* text_end, bool hide_text_after_hash)
+void ImGui::RenderText(ImVec2 pos, const char* text, const char* text_end, bool hide_text_after_hash, const bool bHighlight)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
@@ -3161,7 +3161,7 @@ void ImGui::RenderText(ImVec2 pos, const char* text, const char* text_end, bool 
     const int text_len = (int)(text_display_end - text);
     if (text_len > 0)
     {
-        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(ImGuiCol_Text), text, text_display_end);
+        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(!bHighlight ? ImGuiCol_Text : ImGuiCol_Highlight), text, text_display_end);
         if (g.LogEnabled)
             LogRenderedText(&pos, text, text_display_end);
     }
@@ -3186,7 +3186,7 @@ void ImGui::RenderTextWrapped(ImVec2 pos, const char* text, const char* text_end
 
 // Default clip_rect uses (pos_min,pos_max)
 // Handle clipping on CPU immediately (vs typically let the GPU clip the triangles that are overlapping the clipping rectangle edges)
-void ImGui::RenderTextClipped(const ImVec2& pos_min, const ImVec2& pos_max, const char* text, const char* text_end, const ImVec2* text_size_if_known, const ImVec2& align, const ImRect* clip_rect)
+void ImGui::RenderTextClipped(const ImVec2& pos_min, const ImVec2& pos_max, const char* text, const char* text_end, const ImVec2* text_size_if_known, const ImVec2& align, const ImRect* clip_rect, const bool bHighlight)
 {
     // Hide anything after a '##' string
     const char* text_display_end = FindRenderedTextEnd(text, text_end);
@@ -3215,11 +3215,11 @@ void ImGui::RenderTextClipped(const ImVec2& pos_min, const ImVec2& pos_max, cons
     if (need_clipping)
     {
         ImVec4 fine_clip_rect(clip_min->x, clip_min->y, clip_max->x, clip_max->y);
-        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(ImGuiCol_Text), text, text_display_end, 0.0f, &fine_clip_rect);
+        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(!bHighlight ? ImGuiCol_Text : ImGuiCol_Highlight), text, text_display_end, 0.0f, &fine_clip_rect);
     }
     else
     {
-        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(ImGuiCol_Text), text, text_display_end, 0.0f, NULL);
+        window->DrawList->AddText(g.Font, g.FontSize, pos, GetColorU32(!bHighlight ? ImGuiCol_Text : ImGuiCol_Highlight), text, text_display_end, 0.0f, NULL);
     }
     if (g.LogEnabled)
         LogRenderedText(&pos, text, text_display_end);
@@ -6739,12 +6739,12 @@ bool ImGui::TreeNodeBehavior(ImGuiID id, ImGuiTreeNodeFlags flags, const char* l
             const char log_prefix[] = "\n##";
             const char log_suffix[] = "##";
             LogRenderedText(&text_pos, log_prefix, log_prefix+3);
-            RenderTextClipped(text_pos, bb.Max, label, label_end, &label_size);
+            RenderTextClipped(text_pos, bb.Max, label, label_end, &label_size, ImVec2(0, 0), NULL, (flags & ImGuiTreeNodeFlags_Highlight) != 0);
             LogRenderedText(&text_pos, log_suffix+1, log_suffix+3);
         }
         else
         {
-            RenderTextClipped(text_pos, bb.Max, label, label_end, &label_size);
+            RenderTextClipped(text_pos, bb.Max, label, label_end, &label_size, ImVec2(0, 0), NULL, (flags & ImGuiTreeNodeFlags_Highlight) != 0);
         }
     }
     else
@@ -6759,7 +6759,7 @@ bool ImGui::TreeNodeBehavior(ImGuiID id, ImGuiTreeNodeFlags flags, const char* l
             RenderTriangle(bb.Min + ImVec2(padding.x, g.FontSize*0.15f + text_base_offset_y), is_open ? ImGuiDir_Down : ImGuiDir_Right, 0.70f);
         if (g.LogEnabled)
             LogRenderedText(&text_pos, ">");
-        RenderText(text_pos, label, label_end, false);
+        RenderText(text_pos, label, label_end, false, (flags & ImGuiTreeNodeFlags_Highlight) != 0);
     }
 
     if (is_open && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))

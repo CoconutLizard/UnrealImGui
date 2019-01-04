@@ -602,6 +602,7 @@ enum ImGuiTreeNodeFlags_
     ImGuiTreeNodeFlags_Leaf                 = 1 << 8,   // No collapsing, no arrow (use as a convenience for leaf nodes). 
     ImGuiTreeNodeFlags_Bullet               = 1 << 9,   // Display a bullet instead of arrow
     ImGuiTreeNodeFlags_FramePadding         = 1 << 10,  // Use FramePadding (even for an unframed text node) to vertically align text baseline to regular widget height. Equivalent to calling AlignTextToFramePadding().
+	ImGuiTreeNodeFlags_Highlight			= 1 << 11,
     //ImGuITreeNodeFlags_SpanAllAvailWidth  = 1 << 11,  // FIXME: TODO: Extend hit box horizontally even if not framed
     //ImGuiTreeNodeFlags_NoScrollOnOpen     = 1 << 12,  // FIXME: TODO: Disable automatic scroll on TreePop() if node got just open and contents is not visible
     ImGuiTreeNodeFlags_CollapsingHeader     = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoAutoOpenOnLog
@@ -745,6 +746,7 @@ enum ImGuiCol_
     ImGuiCol_TextSelectedBg,
     ImGuiCol_ModalWindowDarkening,  // darken entire screen when a modal window is active
     ImGuiCol_DragDropTarget,
+	ImGuiCol_Highlight,
     ImGuiCol_COUNT
 
     // Obsolete names (will be removed)

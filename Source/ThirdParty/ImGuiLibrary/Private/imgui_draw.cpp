@@ -173,6 +173,7 @@ void ImGui::StyleColorsClassic(ImGuiStyle* dst)
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
     colors[ImGuiCol_ModalWindowDarkening]   = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+	colors[ImGuiCol_Highlight]				= ImVec4(0.95f, 0.9f, 0.2f, 1.0f);
 }
 
 void ImGui::StyleColorsDark(ImGuiStyle* dst)
