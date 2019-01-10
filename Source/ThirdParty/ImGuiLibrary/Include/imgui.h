@@ -1795,7 +1795,10 @@ namespace ImGui
 		int newSelected = -1;
 
 		/// Sets the active tab
-		void setActiveTab(const unsigned idx);
+		inline void setActiveTab(const unsigned idx)
+		{
+			activeTab = idx;
+		}
 
 		/// Returns the currently active tab
 		const int getActiveTab();
@@ -1824,7 +1827,14 @@ namespace ImGui
 		unsigned CurrentTabBar = 0;
 
 		/// Returns a pointer to the current tab bar
-		TabBar* getCurrentTabBar();
+		TabBar* getCurrentTabBar()
+		{
+			if (CurrentTabBar > TabBarCount) {
+				//std::cerr << "TabBar (Error @getCurrentTabBar()) -- CurrentTabBar > TabBarCount" << std::endl;
+				return NULL;
+			}
+			return &TabBars[CurrentTabBar];
+		}
 
 		/// Clears the counting index for the current tab bar
 		void clearIdxCountCurrentTabBar();

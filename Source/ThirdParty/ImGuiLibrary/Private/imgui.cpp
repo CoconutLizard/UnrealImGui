@@ -11893,10 +11893,6 @@ ImGui::TabBar::TabBar(const char *label, const ImVec2 tab_bar_size) {
 	size = tab_bar_size;
 }
 
-void ImGui::TabBar::setActiveTab(const unsigned idx) {
-	activeTab = (int)idx; // This get's checked at the beginning of
-}
-
 const int ImGui::TabBar::getActiveTab() {
 	return activeTab;
 }
@@ -12069,14 +12065,6 @@ void ImGui::TabBar::_setTabCount() {
 	}
 	tabCount = idxCounter;
 	hasBeenInitialized = true;
-}
-
-ImGui::TabBar* ImGui::TabBarStack::getCurrentTabBar() {
-	if (CurrentTabBar > TabBarCount) {
-		//std::cerr << "TabBar (Error @getCurrentTabBar()) -- CurrentTabBar > TabBarCount" << std::endl;
-		return NULL;
-	}
-	return &TabBars[CurrentTabBar];
 }
 
 void ImGui::TabBarStack::clearIdxCountCurrentTabBar() {
